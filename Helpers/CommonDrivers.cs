@@ -10,6 +10,6 @@ namespace IC_TimeMaterial.Helpers
     class CommonDriver
     {
         //init webdriver
-        public static IWebDriver driver { set; get; }
+        //public static IWebDriver driver { set; get; }
     }
 }

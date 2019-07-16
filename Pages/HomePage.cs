@@ -9,7 +9,7 @@ namespace IC_TimeMaterial.Pages
 {
     class HomePage
     {
-        public void navigateTM(IWebDriver driver)
+        public void NavigateTM(IWebDriver driver)
         {
             //navigate to time and material page
             //Click on administration
@@ -18,6 +18,8 @@ namespace IC_TimeMaterial.Pages
             //click on time and material
             driver.FindElement(By.XPath("/html/body/div[3]/div/div/ul/li[5]/ul/li[3]/a")).Click();
 
+
         }
+       
     }
 }

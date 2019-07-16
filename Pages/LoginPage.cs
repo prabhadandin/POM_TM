@@ -10,7 +10,7 @@ namespace IC_TimeMaterial.Pages
 {
     class LoginPage
     {
-        public void loginSteps(IWebDriver driver)
+        public void LoginSteps(IWebDriver driver)
         {
             //Maximize the browser
             driver.Manage().Window.Maximize();
