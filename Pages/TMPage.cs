@@ -15,27 +15,65 @@ namespace IC_TimeMaterial.Pages
     class TMPage
 
     {
+         IWebDriver driver;
+        WebDriverWait Wait => new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        public TMPage(IWebDriver driver)
+        {
+            this.driver = driver;
+        }
+        
+        IWebElement TypeCode => Wait.Until(driver => driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[1]/div/span[1]")));
+        IWebElement Code => Wait.Until(driver => driver.FindElement(By.Id("Code")));
+        IWebElement Desc => Wait.Until(driver => driver.FindElement(By.Id("Description")));
+        IWebElement Price => Wait.Until(driver => driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[4]/div/span[1]/span/input[1]")));
+        //IWebElement UploadFile => driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[6]/div/div/div/div"));
+        //IWebElement Fileuploadsucess => driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[6]/div/div/ul/li/span[3]"));
+        IWebElement SaveButton => driver.FindElement(By.Id("SaveButton"));
+        IWebElement BackToListPage => Wait.Until(driver=>driver.FindElement(By.XPath("//a[@href='/TimeMaterial']")));
+        IList<IWebElement> Tablerows => driver.FindElements(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr"));
+        IWebElement GridNextPageLink => driver.FindElement(By.XPath("//a[@title='Go to the next page']"));
+        //Func<IWebDriver,IWebElement> GridNextPage => driver.FindElement(By.XPath("//a[@title='Go to the next page']")))
+
+        IWebElement CreateButton => driver.FindElement(By.LinkText("Create New"));
+
+
+        public static Func<IWebDriver, IWebElement> ElementToBeClickable(IWebElement element)
+        {
+            return (driver) =>
+            {
+                try
+                {
+                    if (element != null && element.Displayed && element.Enabled)
+                    {
+                        return element;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (StaleElementReferenceException)
+                {
+                    return null;
+                }
+            };
+        }
 
         public void CrtTM(IWebDriver driver)
         {
-
-
             //Click on create new button
-            driver.FindElement(By.LinkText("Create New")).Click();
+
+            CreateButton.Click();
 
             //wait
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            
             //Click type code drop box
-            driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[1]/div/span[1]")).Click();
+            TypeCode.Click();
 
             //Enter code value
-            driver.FindElement(By.Id("Code")).SendKeys("ME003");
-
+            Code.SendKeys("ME003");
             //Enter description Value
-            driver.FindElement(By.Id("Description")).SendKeys("MEchanical");
-
-            //Get Price by Xpath
-            IWebElement Price = driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[4]/div/span[1]/span/input[1]"));
+            Desc.SendKeys("MEchanical");
             //Scroll to Price unit to make visible to 
             Actions action = new Actions(driver);
             action.MoveToElement(Price).Perform();
@@ -43,41 +81,34 @@ namespace IC_TimeMaterial.Pages
             Price.SendKeys("1213");
 
             //Select FIle to upload
-            driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[6]/div/div/div/div"));
-            driver.FindElement(By.XPath("//*[@id='files']")).SendKeys("G:/Test.txt");
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            // UploadFile.SendKeys("G:/Test.txt");
+            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
             //checked file Successful Upload
-            //IWebElement fileuploadsucess = driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[6]/div/div/ul/li/span[3]"));
             //click save
-            driver.FindElement(By.Id("SaveButton")).Click();
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
-            //Go to last page
-            driver.FindElement(By.LinkText("Go to the last page")).Click();
+            SaveButton.Click();
+
+            BackToListPage.Click();
+            var Tablerows_count = Tablerows.Count;
+
             //check if record created or not
             try
             {
-                //getting the number of rows.
-                IList<IWebElement> row = driver.FindElements(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr"));
-                var row_count = row.Count;
-
                 while (true)
                 {
-                    for (int i = 1; i <= row_count; i++)
+                    for (int i = 1; i <= Tablerows_count; i++)
                     {
-
-                        var codevaluerow = driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]")).Text;
-                        //Assert.IsTrue(codevaluerow.Equals("ME003"));
-                        // StringAssert.Contains("ME003", codevaluerow, "Records Saved successfully!,Test passed");
-                        if (codevaluerow == "ME003")
+                        //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+                       String RowCodeValue = GetPath(i);
+                        if (RowCodeValue.Equals("ME003"))
                         {
 
-                            Console.WriteLine("REcords succcefully created!,Test Pass");
+                            Console.WriteLine("'REcords succcefully created!,Test Pass");
                             return;
                         }
 
                     }
                     //Go to next grid page to search an record
-                    driver.FindElement(By.XPath("//a[@title='Go to the next page']")).Click();
+                    GridNextPageLink.Click();
                 }
 
             }
@@ -88,130 +119,132 @@ namespace IC_TimeMaterial.Pages
 
         }
 
+        public string GetPath(int i)
+        {
+            return Wait.Until(driver=>driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]"))).Text;
+        }
 
         public void EdtTM(IWebDriver driver)
-        {
-            //Explicit wait for driver
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
-           // bool running = true;
-            //Get the total number of rows
-            IList<IWebElement> EditRow_Elements = driver.FindElements(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr"));
-            var EditRows_Count = EditRow_Elements.Count;
+        {    
+           var EditRows_Count = Tablerows.Count;
+
             try
             {
                 while (true)
 
                 {
-
                     for (int i = 1; i <= EditRows_Count; i++)
                     {
-                        //Get the td value of tr[i]th row
-                        var EditingCodeValue = driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]")).Text;
-                        //Check if the code vaue='ME003'  
-                        if (EditingCodeValue == "edittest")
+                        String EditRowCodeValue = GetPath(i);
+
+                        if (EditRowCodeValue.Equals("edittest"))
                         {
                             //Click on edit button 
-                            driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[5]/a[text()='Edit']")).Click();
-                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+                            
+                            IWebElement EditClick = GetEditButtonPath(i);
+                            EditClick.Click();
                             //Edit the TD values
-                            driver.FindElement(By.XPath("//*[@id='Code']")).Clear();
-                            driver.FindElement(By.XPath("//*[@id='Code']")).SendKeys("EditTesting");
-                            driver.FindElement(By.XPath("//*[@id='Description']")).Clear();
-                            driver.FindElement(By.XPath("//*[@id='Description']")).SendKeys("editdesctesting");
+                            Code.Clear();
+                            Code.SendKeys("EditTesting");
+                            Desc.Clear();
+                            Desc.SendKeys("editdesctesting");
 
-                            //IWebElement EditPrice=driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[4]/div/span[1]/span/input[1]']"));
                             //Scroll to Price unit to make visible to 
-                            //Actions action1 = new Actions(driver);
-                            //action1.MoveToElement(EditPrice).Perform();
-                            //EditPrice.Clear();
+                            Actions action1 = new Actions(driver);
+                            action1.MoveToElement(Price).Perform();
+                            Price.Clear();
                             //Send price Value
-                            // EditPrice.SendKeys("1213");
+                            Price.SendKeys("1213");
                             //Select FIle
-                            // driver.FindElement(By.XPath("//*[@id='TimeMaterialEditForm']/div/div[6]/div/div/div/div"));
-                            // driver.FindElement(By.XPath("//*[@id='files']")).SendKeys("G:/Test-Copy.txt");
-                            // driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+
+                            //UploadFile.SendKeys("G:/Test-Copy.txt");
+                            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
                             //Select Download button
                             //driver.FindElement(By.Id("downloadButton")).GetAttribute("Value");
                             // driver.FindElement(By.Id("downloadButton")).Click();
 
-                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+                            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
                             //Click save
-                            driver.FindElement(By.Id("SaveButton")).Click();
-                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(40);
+                            SaveButton.Click();
+
                             // Go to last page
-                            //driver.FindElement(By.LinkText("Go to the last page")).Click();
-                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(100);
+                            //BackToListPage.Click();
+                            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
                             Assert.IsTrue(true);
-                      
+
                             Console.WriteLine("Records updated successfully!,Text Pass");
                             return;
                         }
                     }
                     //Go to next grid page to search an record
-                    driver.FindElement(By.XPath("//a[@title='Go to the next page']")).Click();
-                    driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+                   // driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+                    GridNextPageLink.Click();
+                   
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Records not updated, Test Failed"+e);
+                Console.WriteLine("Records not updated, Test Failed" + e);
             }
         }
-      public void DelTM(IWebDriver driver)
+
+        private IWebElement GetEditButtonPath(int i)
+        {
+            return driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[5]/a[text()='Edit']"));
+        }
+
+        public void DelTM(IWebDriver driver)
         {
 
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            var DelRows_Count = Tablerows.Count;
 
-            //Get the total number of rows
-            IList<IWebElement> DelRow_Elements = driver.FindElements(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr"));
-            var DelRows_Count = DelRow_Elements.Count;
             try
             {
                 while (true)
 
                 {
-
                     for (int i = 1; i <= DelRows_Count; i++)
                     {
                         //Get the td value of tr[i]th row
-                        var DelCodeValue = driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[1]")).Text;
-                        //Check if the code vaue='ME003'  
-                        if (DelCodeValue == "123")
+                        string DelRow_CodeValue = GetPath(i);
+
+                        if (DelRow_CodeValue.Equals("deltest"))
                         {
                             //Click on delete button 
-                            driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[5]/a[@class='k-button k-button-icontext k-grid-Delete']")).Click();
-                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+                            IWebElement DelButton = GetDelButtonPath(i);
+                            DelButton.Click();
+                           
+                           
                             //Switch the control pf 'driver' to ther alert window
                             IAlert altert = driver.SwitchTo().Alert();
                             //get confirmation text
                             String ConfirmationalterText = altert.Text;
-
                             Console.WriteLine("Confirmation text" + ConfirmationalterText);
                             //to accept the alter(click on ok button)
                             altert.Accept();
-
-                            // Go to last page
-                            //driver.FindElement(By.LinkText("Go to the last page")).Click();
-                            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(100);
+                            
                             Assert.IsTrue(true);
-
                             StringAssert.DoesNotContain("DelCodeValue", "deltest");
                             Console.WriteLine("Records deleted successfully!,Test Pass");
+                            return;
                         }
                     }
                     //Go to next grid page to search an record
-                    driver.FindElement(By.XPath("//a[@title='Go to the next page']")).Click();
-                    driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
-
-
+                    GridNextPageLink.Click();
+                    //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Console.WriteLine("Records not deleted!,Test fails");
+                Console.WriteLine("Records not deleted!,Test fails" + e);
             }
         }
 
-   } 
+        private IWebElement GetDelButtonPath(int i)
+        {
+            return Wait.Until(driver=>driver.FindElement(By.XPath("//*[@id='tmsGrid']/div[3]/table/tbody/tr[" + i + "]/td[5]/a[text()='Delete']")));
+        }
+    }
 }
 
