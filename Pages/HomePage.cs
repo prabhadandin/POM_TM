@@ -9,16 +9,24 @@ namespace IC_TimeMaterial.Pages
 {
     class HomePage
     {
-        public void NavigateTM(IWebDriver driver)
+        private IWebDriver driver;
+
+        public HomePage(IWebDriver driver)
+        {
+            this.driver = driver;
+        }
+       IWebElement AdminPage => driver.FindElement(By.XPath("/html/body/div[3]/div/div/ul/li[5]/a"));
+        IWebElement TMCategory => driver.FindElement(By.XPath("/html/body/div[3]/div/div/ul/li[5]/ul/li[3]/a"));
+
+        public void NavigateTM()
         {
             //navigate to time and material page
-            //Click on administration
-            driver.FindElement(By.XPath("/html/body/div[3]/div/div/ul/li[5]/a")).Click();
+            //Click on administration Tab
+            AdminPage.Click();
 
-            //click on time and material
-            driver.FindElement(By.XPath("/html/body/div[3]/div/div/ul/li[5]/ul/li[3]/a")).Click();
-
-
+            //click on time and material category
+            TMCategory.Click();
+            
         }
        
     }

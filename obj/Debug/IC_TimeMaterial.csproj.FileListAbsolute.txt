@@ -125,3 +125,9 @@ G:\IC_Projects\IC_TimeMaterial\bin\Debug\Newtonsoft.Json.xml
 G:\IC_Projects\IC_TimeMaterial\bin\Debug\System.Threading.Tasks.Extensions.xml
 G:\IC_Projects\IC_TimeMaterial\bin\Debug\Utf8Json.xml
 G:\IC_Projects\IC_TimeMaterial\obj\Debug\IC_TimeMaterial.exe.config
+G:\IC_Projects\IC_TimeMaterial\bin\Debug\ExcelDataReader.DataSet.dll
+G:\IC_Projects\IC_TimeMaterial\bin\Debug\ExcelDataReader.dll
+G:\IC_Projects\IC_TimeMaterial\bin\Debug\ExcelDataReader.pdb
+G:\IC_Projects\IC_TimeMaterial\bin\Debug\ExcelDataReader.xml
+G:\IC_Projects\IC_TimeMaterial\bin\Debug\ExcelDataReader.DataSet.pdb
+G:\IC_Projects\IC_TimeMaterial\bin\Debug\ExcelDataReader.DataSet.xml

@@ -27,22 +27,26 @@ namespace IC_TimeMaterial
             //CommonDriver.driver = new ChromeDriver();
             //define driver
 
-             driver = new ChromeDriver();
-           
+            driver = new ChromeDriver();
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            // Populate Data from excel
+            ExcelLibHelpers.PopulateInCollection(@"G:\IC_Projects\IC_TimeMaterial\Data\data.xlsx", "TM");
+
             //Login action
             LoginPage loginObj = new LoginPage(driver);
             loginObj.LoginSteps(driver);
 
             //Navigate to Time & Material  Page
-            HomePage homeObj = new HomePage();
-            homeObj.NavigateTM(driver);
+            HomePage homeObj = new HomePage(driver);
+            homeObj.NavigateTM();
         }
+
         [Test]
         public void CreateTM()
         {
             TMPage tmObj = new TMPage(driver);
             tmObj.CrtTM(driver);
-
+            tmObj.ValidateNewRecord(driver);
         }
 
         [Test]
@@ -50,7 +54,6 @@ namespace IC_TimeMaterial
         {
             TMPage tmObj = new TMPage(driver);
             tmObj.EdtTM(driver);
-
         }
 
         [Test]

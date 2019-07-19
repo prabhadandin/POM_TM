@@ -1,11 +1,8 @@
-﻿using NUnit.Framework;
+﻿using IC_TimeMaterial.Helpers;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IC_TimeMaterial.Pages
 {
@@ -28,12 +25,20 @@ namespace IC_TimeMaterial.Pages
             driver.Manage().Window.Maximize();
 
             //Navigate to login page
-            driver.Navigate().GoToUrl("http://horse-dev.azurewebsites.net/Account/Login");
+            // driver.Navigate().GoToUrl("http://horse-dev.azurewebsites.net/Account/Login");
+            //Read navigate url from Excel file
+            driver.Navigate().GoToUrl(ExcelLibHelpers.ReadData(2, "url"));
+
 
             //Enter user name using ID
-            Username.SendKeys("hari");
+            // Username.SendKeys("hari
+            //Reading userid from excel
+            Username.SendKeys(ExcelLibHelpers.ReadData(2, "username"));
             //Enter password using ID
-            Password.SendKeys("123123");
+            // Password.SendKeys("123123");
+            //Readin password from excel
+            Password.SendKeys(ExcelLibHelpers.ReadData(2, "password"));
+
             //Click login button
             LoginButton.Click();
            //Validate if the user had logged in succfully
